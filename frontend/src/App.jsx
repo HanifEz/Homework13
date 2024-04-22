@@ -1,26 +1,27 @@
-import { VStack } from "@chakra-ui/react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import BookDetails from "./pages/BooksDetail";
-import EditBookPage from "./pages/Editbook";
-import Homepage from "./pages/Homepage";
-import NewBookPage from "./pages/NewBooks";
-import Register from "./pages/Register";
+import Navbar from './components/Navbar';
+import Books from './pages/Books';
+import Register from './components/Register';
+import BookForm from './components/BookForm';
+import Login from './components/Login';
+import Edit from './pages/Edit';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import PrivateRoutes from './utils/PrivateRoutes';
 
 function App() {
   return (
-    <VStack minH="100vh" minW="100vw">
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path={"/"} element={<Homepage />} />
-          <Route path={"/register"} element={<Register />} />
-          <Route path={"/newbook"} element={<NewBookPage />} />
-          <Route path={"/books/:id"} element={<BookDetails />} />
-          <Route path={"/editbook/:id"} element={<EditBookPage />} />
-        </Routes>
-      </Router>
-    </VStack>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Navigate to="/books" />} />
+        <Route path="/books" element={<Books />} />
+        <Route element={<PrivateRoutes />}>
+          <Route path="/create" element={<BookForm />} />
+          <Route path="/books/:id" element={<Edit />} />
+        </Route>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </>
   );
 }
 

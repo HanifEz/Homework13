@@ -1,140 +1,119 @@
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Image,
-  Input,
-  useToast,
-  VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { createBook, editBook } from "../modules/fetch";
+import { useState } from 'react';
+import { createBook } from '../fetch/books';
+import Swal from 'sweetalert2';
 
-export default function BookForm({ bookData }) {
-  const toast = useToast();
-  const [selectedImage, setSelectedImage] = useState(null);
+export default function BookForm() {
+  const [file, setFile] = useState(null);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (!selectedImage) {
-      toast({
-        title: "Error",
-        description: "Please select image",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-    const formData = new FormData(event.target);
-    if (bookData) {
-      try {
-        await editBook(
-          bookData.id,
-          formData.get("title"),
-          formData.get("author"),
-          formData.get("publisher"),
-          parseInt(formData.get("year")),
-          parseInt(formData.get("pages"))
-        );
-        toast({
-          title: "Success",
-          description: "Book edited successfully",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.response.data.message || "Something went wrong",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!file) {
+      alert('Please upload an image');
       return;
     }
+    const formData = new FormData(e.target);
+
     try {
       await createBook(formData);
-      event.target.reset();
-      toast({
-        title: "Success",
-        description: "Book created successfully",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
+      Swal.fire({
+        icon: 'success',
+        title: 'Book created successfully',
+        showConfirmButton: false,
+        timer: 1500,
       });
-      setSelectedImage("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.response.data.message || "Something went wrong",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      e.target.reset();
+      setFile(null);
+    } catch (err) {
+      console.log(err);
     }
   }
 
-  useEffect(() => {
-    if (bookData?.image) {
-      setSelectedImage(`http://localhost:8000/${bookData?.image}`);
-    }
-  }, [bookData]);
-
   return (
-    <form onSubmit={handleSubmit}>
-      <VStack spacing={4}>
-        <FormControl>
-          <FormLabel>Title</FormLabel>
-          <Input name="title" required defaultValue={bookData?.title} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Author</FormLabel>
-          <Input name="author" required defaultValue={bookData?.author} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Publisher</FormLabel>
-          <Input name="publisher" required defaultValue={bookData?.publisher} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Year</FormLabel>
-          <Input
+    <div className="p-2">
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="title">Title</label>
+        </div>
+        <div>
+          <input
+            type="text"
+            name="title"
+            placeholder="Type here"
+            className="input input-bordered w-full my-2"
+            id="title"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="author">Author</label>
+        </div>
+        <div>
+          <input
+            type="text"
+            name="author"
+            placeholder="Type here"
+            className="input input-bordered w-full my-2"
+            id="author"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="publisher">Publisher</label>
+        </div>
+        <div>
+          <input
+            type="text"
+            name="publisher"
+            placeholder="Type here"
+            className="input input-bordered w-full my-2"
+            id="publisher"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="year">Year</label>
+        </div>
+        <div>
+          <input
+            type="number"
             name="year"
-            type="number"
+            placeholder="Type here"
+            className="input input-bordered w-full my-2"
+            id="year"
             required
-            defaultValue={bookData?.year}
           />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Pages</FormLabel>
-          <Input
+        </div>
+        <div>
+          <label htmlFor="pages">Pages</label>
+        </div>
+        <div>
+          <input
+            type="number"
             name="pages"
-            type="number"
+            placeholder="Type here"
+            className="input input-bordered w-full my-2"
+            id="pages"
             required
-            defaultValue={bookData?.pages}
           />
-        </FormControl>
-        {selectedImage && (
-          <Image w={64} src={selectedImage} alt="Selected Image" />
-        )}
-        {!bookData?.image && (
-          <FormControl>
-            <FormLabel>Image</FormLabel>
-            <Input
-              name="image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                setSelectedImage(URL.createObjectURL(file));
-              }}
-            />
-          </FormControl>
-        )}
-
-        <Button type="submit">{bookData ? "Edit Book" : "Create Book"}</Button>
-      </VStack>
-    </form>
+        </div>
+        <div>
+          <label htmlFor="image">Image</label>
+        </div>
+        <input
+          type="file"
+          id="image"
+          name="image"
+          onChange={(e) => {
+            const file2 = e.target.files[0];
+            setFile(URL.createObjectURL(file2));
+          }}
+        />
+        <div>
+          <button type="submit" className="btn btn-accent mt-4">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
